@@ -1,3 +1,8 @@
+# Deploy the KermIT backend
+# Custom agents and queues for MCollective
+# used by the KermIT dashboard
+# Cf http://www.kermit.fr
+
 class kermit( $recvnode = 'el6', $nocnode = 'el6' ) {
 
     include mcollective
@@ -40,7 +45,6 @@ class kermit( $recvnode = 'el6', $nocnode = 'el6' ) {
         source  => 'puppet:///modules/kermit/amqpqueue.cfg',
         require => File['/etc/kermit/'],
     }
-
 
     file { '/usr/local/bin/kermit' :
         ensure  => directory,
@@ -109,5 +113,21 @@ class kermit( $recvnode = 'el6', $nocnode = 'el6' ) {
           require => Package[ 'mcollective-common' ],
           notify  => Service[ 'mcollective' ],
     }
+
+    package { 'mcollective-puppet-agent' :
+        ensure  => present,
+        require => [  Yumrepo[ 'kermit-thirdpart' ],
+                      Package[ 'mcollective-common' ], ],
+    }
+
+    package { 'mcollective-puppet-client' :
+        ensure  => $::hostname ? {
+            $nocnode => present,
+            default  => absent,
+        },
+        require => [  Yumrepo[ 'kermit-thirdpart' ],
+                      Package[ 'mcollective-common' ], ],
+    }
+
 }
 
