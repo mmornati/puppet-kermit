@@ -6,6 +6,7 @@
 class kermit( $recvnode = 'el6', $nocnode = 'el6' ) {
 
     include mcollective
+    include yum::kermit
 
     file { '/etc/kermit/' :
         ensure  => directory,
