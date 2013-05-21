@@ -25,7 +25,7 @@ class kermit( $recvnode = 'el6', $nocnode = 'el6' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///modules/kermit/q-private.pem',
+        source  => 'puppet:///public/kermit/q-private.pem', # yes, it is public
         require => [ File['/etc/kermit/ssl/'], Package['mcollective-common'] ],
     }
 
