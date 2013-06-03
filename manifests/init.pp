@@ -3,7 +3,7 @@
 # used by the KermIT dashboard
 # Cf http://www.kermit.fr
 
-class kermit( $recvnode = 'el6', $nocnode = 'el6' ) {
+class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
 
     include mcollective
     include yum::kermit
@@ -18,7 +18,7 @@ class kermit( $recvnode = 'el6', $nocnode = 'el6' ) {
     }
 
     file { '/etc/kermit/ssl/q-private.pem' :
-        ensure  => $::hostname ? {
+        ensure  => $::fqdn ? {
             $recvnode => absent,
             default   => present,
         },
@@ -100,7 +100,7 @@ class kermit( $recvnode = 'el6', $nocnode = 'el6' ) {
                       Package[ 'mcollective-common' ], ],
     }
 
-    $agentsrc = $::hostname ? {
+    $agentsrc = $::fqdn ? {
         $nocnode => undef,
         default  => 'puppet:///modules/mcoagents',
     }
@@ -122,7 +122,7 @@ class kermit( $recvnode = 'el6', $nocnode = 'el6' ) {
     }
 
     package { 'mcollective-puppet-client' :
-        ensure  => $::hostname ? {
+        ensure  => $::fqdn ? {
             $nocnode => present,
             default  => absent,
         },
