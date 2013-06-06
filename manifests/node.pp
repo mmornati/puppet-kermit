@@ -3,7 +3,7 @@
 # used by the KermIT dashboard
 # Cf http://www.kermit.fr
 
-class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
+class kermit::node( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
 
     include mcollective
     include yum::kermit
@@ -25,7 +25,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///public/kermit/q-private.pem', # yes, it is public
+        source  => 'puppet:///public/kermit/node/q-private.pem', # yes, it is public
         require => [ File['/etc/kermit/ssl/'], Package['mcollective-common'] ],
     }
 
@@ -34,7 +34,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///modules/kermit/kermit.cfg',
+        source  => 'puppet:///modules/kermit/node/kermit.cfg',
         require => File['/etc/kermit/'],
     }
 
@@ -43,7 +43,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///modules/kermit/amqpqueue.cfg',
+        source  => 'puppet:///modules/kermit/node/amqpqueue.cfg',
         require => File['/etc/kermit/'],
     }
 
@@ -67,7 +67,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///modules/kermit/send.rb',
+        source  => 'puppet:///modules/kermit/node/send.rb',
         require => File['/usr/local/bin/kermit/queue/'],
     }
 
@@ -76,7 +76,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///modules/kermit/sendlog.rb',
+        source  => 'puppet:///modules/kermit/node/sendlog.rb',
         require => File['/usr/local/bin/kermit/queue/'],
     }
 
