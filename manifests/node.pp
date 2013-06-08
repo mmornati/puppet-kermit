@@ -1,12 +1,12 @@
-# Deploy the KermIT backend
-# Custom agents and queues for MCollective
+# Deploy the KermIT backend and queues for MCollective
 # used by the KermIT dashboard
 # Cf http://www.kermit.fr
 
-class kermit::node( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
+class kermit::node( $recvnode = 'el6.labothink.fr' ) {
 
     include mcollective
-    include yum::kermit
+    include kermit::yum
+    include kermit::mcoagents
 
     file { '/etc/kermit/' :
         ensure  => directory,
@@ -88,46 +88,6 @@ class kermit::node( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr
     package { $mcoreq_packages :
         ensure  => present,
         require => Yumrepo[ 'kermit-custom', 'kermit-thirdpart' ],
-    }
-
-    $mcoplug_packages = [ 'mcollective-plugins-agentinfo',
-      'mcollective-plugins-nodeinfo', 'mcollective-plugins-facter_facts',
-      'mcollective-plugins-package',  'mcollective-plugins-service' ]
-
-    package { $mcoplug_packages :
-        ensure  => installed,
-        require => [  Yumrepo[ 'kermit-custom', 'kermit-thirdpart' ],
-                      Package[ 'mcollective-common' ], ],
-    }
-
-    $agentsrc = $::fqdn ? {
-        $nocnode => undef,
-        default  => 'puppet:///modules/mcoagents',
-    }
-
-    file { '/usr/libexec/mcollective/mcollective/agent' :
-          ensure  => directory,
-          recurse => true,   # <- That's all needed --v
-          source  => $agentsrc,
-          owner   => 'root',
-          group   => 'root',
-          require => Package[ 'mcollective-common' ],
-          notify  => Service[ 'mcollective' ],
-    }
-
-    package { 'mcollective-puppet-agent' :
-        ensure  => present,
-        require => [  Yumrepo[ 'kermit-thirdpart' ],
-                      Package[ 'mcollective-common' ], ],
-    }
-
-    package { 'mcollective-puppet-client' :
-        ensure  => $::fqdn ? {
-            $nocnode => present,
-            default  => absent,
-        },
-        require => [  Yumrepo[ 'kermit-thirdpart' ],
-                      Package[ 'mcollective-common' ], ],
     }
 
 }
