@@ -6,11 +6,8 @@ class kermit::node( $recvnode = 'el6.labothink.fr' ) {
 
     include mcollective
     include kermit::yum
+    include kermit::common
     include kermit::mcoagents
-
-    file { '/etc/kermit/' :
-        ensure  => directory,
-    }
 
     file { '/etc/kermit/ssl/' :
         ensure  => directory,

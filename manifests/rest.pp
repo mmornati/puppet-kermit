@@ -8,6 +8,7 @@
 class kermit::rest {
     include yum
     include kermit::yum
+    include kermit::common
     include passenger
 
     include mcollective::client
@@ -22,21 +23,13 @@ class kermit::rest {
         enable => false,
     }
 
-    # File['/etc/kermit'] is set in the module 'kermit'.
-    # This avoids unnecessary module dependency :
-    exec { 'mkdir /etc/kermit' :
-            path    => '/bin/',
-            command => 'mkdir -p /etc/kermit',
-            creates => '/etc/kermit',
-    }
-
     file { '/etc/kermit/kermit-restmco.cfg' :
         ensure  => present,
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
         source  => 'puppet:///modules/kermit/rest/kermit-restmco.cfg',
-        require => Exec[ 'mkdir /etc/kermit' ],
+        require => File[ '/etc/kermit' ],
     }
 
     file { '/var/log/kermit-restmco.log' :
