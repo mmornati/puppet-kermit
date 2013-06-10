@@ -12,7 +12,7 @@ class kermit::rest {
     include passenger
 
     include mcollective::client
-    
+
     package { 'kermit-restmco' :
         ensure  => present,
         require => [ Yumrepo['kermit-custom', 'kermit-thirdpart'], ],
@@ -30,7 +30,7 @@ class kermit::rest {
         mode    => '0644',
         source  => 'puppet:///modules/kermit/rest/kermit-restmco.cfg',
         require => File[ '/etc/kermit' ],
-        notify => Service [ 'httpd' ],
+        notify  => Service [ 'httpd' ],
     }
 
     file { '/var/log/kermit-restmco.log' :
@@ -79,7 +79,7 @@ class kermit::rest {
         mode    => '0644',
         source  => 'puppet:///modules/kermit/rest/mc-rpc-restserver.rb',
         require => File[ '/var/www/restmco' ],
-        notify => Service [ 'httpd' ],
+        notify  => Service [ 'httpd' ],
     }
 
     file { 'config.ru' :
@@ -90,7 +90,7 @@ class kermit::rest {
         mode    => '0644',
         source  => 'puppet:///modules/kermit/rest/config.ru',
         require => File[ '/var/www/restmco' ],
-        notify => Service [ 'httpd' ],
+        notify  => Service [ 'httpd' ],
     }
 
     file { 'restmco.conf' :
@@ -101,7 +101,7 @@ class kermit::rest {
         mode    => '0644',
         source  => 'puppet:///modules/kermit/rest/restmco.conf',
         require => Package[ 'httpd' ],
-        notify => Service [ 'httpd' ],
+        notify  => Service [ 'httpd' ],
     }
 
 }
