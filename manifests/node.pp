@@ -1,16 +1,13 @@
-# Deploy the KermIT backend
-# Custom agents and queues for MCollective
+# Deploy the KermIT backend and queues for MCollective
 # used by the KermIT dashboard
 # Cf http://www.kermit.fr
 
-class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
+class kermit::node( $recvnode = 'el6.labothink.fr' ) {
 
     include mcollective
-    include yum::kermit
-
-    file { '/etc/kermit/' :
-        ensure  => directory,
-    }
+    include kermit::yum
+    include kermit::common
+    include kermit::mcoagents
 
     file { '/etc/kermit/ssl/' :
         ensure  => directory,
@@ -25,7 +22,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///public/kermit/q-private.pem', # yes, it is public
+        source  => 'puppet:///public/kermit/node/q-private.pem', # yes, it is public
         require => [ File['/etc/kermit/ssl/'], Package['mcollective-common'] ],
     }
 
@@ -34,7 +31,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///modules/kermit/kermit.cfg',
+        source  => 'puppet:///modules/kermit/node/kermit.cfg',
         require => File['/etc/kermit/'],
     }
 
@@ -43,7 +40,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///modules/kermit/amqpqueue.cfg',
+        source  => 'puppet:///modules/kermit/node/amqpqueue.cfg',
         require => File['/etc/kermit/'],
     }
 
@@ -67,7 +64,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///modules/kermit/send.rb',
+        source  => 'puppet:///modules/kermit/node/send.rb',
         require => File['/usr/local/bin/kermit/queue/'],
     }
 
@@ -76,7 +73,7 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        source  => 'puppet:///modules/kermit/sendlog.rb',
+        source  => 'puppet:///modules/kermit/node/sendlog.rb',
         require => File['/usr/local/bin/kermit/queue/'],
     }
 
@@ -88,46 +85,6 @@ class kermit( $recvnode = 'el6.labothink.fr', $nocnode = 'el6.labothink.fr' ) {
     package { $mcoreq_packages :
         ensure  => present,
         require => Yumrepo[ 'kermit-custom', 'kermit-thirdpart' ],
-    }
-
-    $mcoplug_packages = [ 'mcollective-plugins-agentinfo',
-      'mcollective-plugins-nodeinfo', 'mcollective-plugins-facter_facts',
-      'mcollective-plugins-package',  'mcollective-plugins-service' ]
-
-    package { $mcoplug_packages :
-        ensure  => installed,
-        require => [  Yumrepo[ 'kermit-custom', 'kermit-thirdpart' ],
-                      Package[ 'mcollective-common' ], ],
-    }
-
-    $agentsrc = $::fqdn ? {
-        $nocnode => undef,
-        default  => 'puppet:///modules/mcoagents',
-    }
-
-    file { '/usr/libexec/mcollective/mcollective/agent' :
-          ensure  => directory,
-          recurse => true,   # <- That's all needed --v
-          source  => $agentsrc,
-          owner   => 'root',
-          group   => 'root',
-          require => Package[ 'mcollective-common' ],
-          notify  => Service[ 'mcollective' ],
-    }
-
-    package { 'mcollective-puppet-agent' :
-        ensure  => present,
-        require => [  Yumrepo[ 'kermit-thirdpart' ],
-                      Package[ 'mcollective-common' ], ],
-    }
-
-    package { 'mcollective-puppet-client' :
-        ensure  => $::fqdn ? {
-            $nocnode => present,
-            default  => absent,
-        },
-        require => [  Yumrepo[ 'kermit-thirdpart' ],
-                      Package[ 'mcollective-common' ], ],
     }
 
 }
