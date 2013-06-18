@@ -12,8 +12,17 @@ class kermit::webui {
     # cf module puppetlabs-apache
     include apache
     apache::mod { 'wsgi': }
+
     # the puppetlabs base apache module v. 0.6.0 does not open the http port
-    include apachefw
+    include myfirewall
+    if ! defined(Firewall[ '200 http' ]) {
+      @firewall { '200 http' :
+          action => 'accept',
+          dport  => 80,
+          proto  => 'tcp'
+      }
+    }
+    realize Firewall[ '200 http' ]
 
     if $::operatingsystemrelease =~ /^5\./ {
       $webuireq_packages = [
